@@ -40,7 +40,7 @@ end
 
 coreo_uni_util_jsrunner "usage" do
   action :run
-  json_input '{}'
+  json_input 'COMPOSITE::coreo_aws_rule_runner.usage.report'
   function <<-EOH
 
     callback(json_input);
