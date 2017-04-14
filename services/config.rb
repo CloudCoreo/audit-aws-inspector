@@ -47,9 +47,9 @@ coreo_uni_util_jsrunner "usage" do
   EOH
 end
 
-coreo_uni_util_variables "findings-var" do
-  action :set
-  variables([
-                {'COMPOSITE::coreo_aws_rule_runner.usage.report' => 'COMPOSITE::coreo_uni_util_jsrunner.usage.report'},
-            ])
-end
+# coreo_uni_util_variables "findings-var" do
+#   action :set
+#   variables([
+#                 {'COMPOSITE::coreo_aws_rule_runner.usage.report' => 'COMPOSITE::coreo_uni_util_jsrunner.usage.report'},
+#             ])
+# end
