@@ -1,10 +1,10 @@
 coreo_aws_rule "inspector-findings" do
   action :define
   service :inspector
-  display_name "Reserved instances purchased and unused"
-  description "This rule checks for any active and purchased reserved instances that are not covering any RIs"
-  category "Spend"
-  suggested_action "Consider launching instances with RI coverage"
+  display_name "Check Inspector Findings"
+  description "This rule is an inventory of vulnerabilities across AWS Inspector reports"
+  category "Endpoints"
+  suggested_action "N/A"
   level "Inventory"
   objectives ["list_findings", "describe_findings"]
   call_modifiers [ {}, {finding_arns: ["finding_arns"]} ]
@@ -59,7 +59,7 @@ coreo_uni_util_jsrunner "usage" do
             var suggested_action = violator_info['recommendation'];
             var level = violator_info['severity'];
 
-            var meta_cis_id = display_name.split()[0];
+            var meta_cis_id = display_name.split(' ')[0];
             var meta_cis_level = violator_info['attributes'].find(o => o.key === 'CIS_BENCHMARK_PROFILE')['value'];
 
             for (cc_rule_name in violations) {
