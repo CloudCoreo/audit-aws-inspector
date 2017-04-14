@@ -6,11 +6,12 @@ coreo_aws_rule "inspector-findings" do
   category "Spend"
   suggested_action "Consider launching instances with RI coverage"
   level "Inventory"
-  objectives ["findings"]
-  audit_objects ["object.findings.arn"]
-  operators ["=~"]
-  raise_when [//]
-  id_map "resp.findings.arn"
+  objectives ["list_findings", "describe_findings"]
+  call_modifiers [ {}, {finding_arns: ["finding_arns"]} ]
+  audit_objects ["", "object.findings.arn"]
+  operators ["", "=~"]
+  raise_when ["", //]
+  id_map "object.findings.arn"
 end
 
 # coreo_aws_rule "ec2-inventory" do
