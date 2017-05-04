@@ -1,1 +1,1 @@
-This repo is designed to work with CloudCoreo. It will monitor EC2 Reserved Instances against best practices for you and send a report to the email address designated by the config.yaml AUDIT_AWS_EC2_RIS_ALERT_RECIPIENT value
+This composite collectes AWS Inspector CIS endpoint violations and reports on them

@@ -1,4 +1,2 @@
-1. Audit
-1. Best Practices
-1. Alert
-1. EC2_RI
+1. AWS Reserved Instances
+1. AWS Inspector
