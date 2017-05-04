@@ -4,7 +4,7 @@ This stack will monitor EC2 RI and alert on things CloudCoreo developers think a
 
 
 ## Description
-This repo is designed to work with CloudCoreo. It will monitor EC2 Reserved Instances against best practices for you and send a report to the email address designated by the config.yaml AUDIT_AWS_EC2_RIS_ALERT_RECIPIENT value
+This composite collectes AWS Inspector CIS endpoint violations and reports on them
 
 ## Hierarchy
 ![composite inheritance hierarchy](https://raw.githubusercontent.com/CloudCoreo/audit-aws-ec2-ris/master/images/hierarchy.png "composite inheritance hierarchy")
@@ -31,10 +31,8 @@ This repo is designed to work with CloudCoreo. It will monitor EC2 Reserved Inst
 **None**
 
 ## Tags
-1. Audit
-1. Best Practices
-1. Alert
-1. EC2_RI
+1. AWS Reserved Instances
+1. AWS Inspector
 
 ## Categories
 1. AWS Operations Automation
