@@ -37,7 +37,7 @@ This repo is designed to work with CloudCoreo. It will monitor EC2 Reserved Inst
 1. EC2_RI
 
 ## Categories
-1. Audit
+1. AWS Operations Automation
 
 
 
