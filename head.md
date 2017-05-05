@@ -1,3 +1,3 @@
-audit EC2 RI
+AWS Inspector
 ============================
-This stack will monitor EC2 RI and alert on things CloudCoreo developers think are violations of best practices
+This composite collectes AWS Inspector CIS endpoint violations and reports on them
