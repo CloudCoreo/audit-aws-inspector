@@ -31,8 +31,8 @@ This composite collectes AWS Inspector CIS endpoint violations and reports on th
 **None**
 
 ## Tags
-1. AWS Reserved Instances
 1. AWS Inspector
+
 
 ## Categories
 1. AWS Operations Automation
