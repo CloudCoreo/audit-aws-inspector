@@ -7,7 +7,7 @@ This composite collectes AWS Inspector CIS endpoint violations and reports on th
 This composite collectes AWS Inspector CIS endpoint violations and reports on them
 
 ## Hierarchy
-![composite inheritance hierarchy](https://raw.githubusercontent.com/CloudCoreo/audit-aws-ec2-ris/master/images/hierarchy.png "composite inheritance hierarchy")
+![composite inheritance hierarchy](https://raw.githubusercontent.com/CloudCoreo/audit-aws-inspector/master/images/hierarchy.png "composite inheritance hierarchy")
 
 
 
