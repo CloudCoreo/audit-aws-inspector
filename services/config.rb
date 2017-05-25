@@ -14,28 +14,20 @@ coreo_aws_rule "inspector-findings" do
   id_map "object.findings.arn"
 end
 
-# coreo_aws_rule "ec2-inventory" do
-#   action :define
-#   service :ec2
-#   link ""
-#   display_name "Inventory of EC2 (non-spot) Instances"
-#   description "An inventory of EC2 (non-spot) Instances"
-#   category "Inventory"
-#   suggested_action "N/A"
-#   level "Informational"
-#   objectives ["instances"]
-#   audit_objects ["object.reservations.instances.state.name"]
-#   operators ["=="]
-#   raise_when ["running"]
-#   id_map "object.reservations.instances.instance_id"
-# end
+coreo_uni_util_variables "inspector-planwide" do
+  action :set
+  variables([
+                {'COMPOSITE::coreo_uni_util_variables.inspector-planwide.composite_name' => 'PLAN::stack_name'},
+                {'COMPOSITE::coreo_uni_util_variables.inspector-planwide.plan_name' => 'PLAN::name'},
+                {'COMPOSITE::coreo_uni_util_variables.inspector-planwide.results' => 'unset'},
+                {'GLOBAL::number_violations' => '0'}
+            ])
+end
 
-coreo_aws_rule_runner "usage" do
+coreo_aws_rule_runner "advise-inspector" do
   action :run
   service :inspector
-  rules [
-            "inspector-findings"
-        ]
+  rules ${AUDIT_AWS_INSPECTOR_ALERT_LIST}
 end
 
 coreo_uni_util_jsrunner "usage" do
@@ -96,9 +88,168 @@ coreo_uni_util_jsrunner "usage" do
   EOH
 end
 
-coreo_uni_util_variables "findings-var" do
+coreo_uni_util_variables "update-plandwide-1" do
   action :set
   variables([
                 {'COMPOSITE::coreo_aws_rule_runner.usage.report' => 'COMPOSITE::coreo_uni_util_jsrunner.usage.return'},
             ])
+end
+
+coreo_uni_util_jsrunner "inspector-tags-to-notifiers-array" do
+  action :run
+  data_type "json"
+  provide_composite_access true
+  packages([
+               {
+                   :name => "cloudcoreo-jsrunner-commons",
+                   :version => "1.9.7-beta22"
+               },
+               {
+                   :name => "js-yaml",
+                   :version => "3.7.0"
+               }       ])
+  json_input '{ "compositeName":"PLAN::stack_name",
+                "planName":"PLAN::name",
+                "cloudAccountName": "PLAN::cloud_account_name",
+                "violations": COMPOSITE::coreo_aws_rule_runner.advise-inspector.report}'
+  function <<-EOH
+  
+const compositeName = json_input.compositeName;
+const planName = json_input.planName;
+const cloudAccount = json_input.cloudAccountName;
+const cloudObjects = json_input.violations;
+
+const NO_OWNER_EMAIL = "${AUDIT_AWS_INSPECTOR_RECIPIENT}";
+const OWNER_TAG = "${AUDIT_AWS_INSPECTOR_OWNER_TAG}";
+const ALLOW_EMPTY = "${AUDIT_AWS_INSPECTOR_ALLOW_EMPTY}";
+const SEND_ON = "${AUDIT_AWS_INSPECTOR_SEND_ON}";
+
+const alertListArray = ${AUDIT_AWS_INSPECTOR_ALERT_LIST};
+const ruleInputs = {};
+
+let userSuppression;
+let userSchemes;
+
+const fs = require('fs');
+const yaml = require('js-yaml');
+
+function setSuppression() {
+  try {
+    userSuppression = yaml.safeLoad(fs.readFileSync('./suppression.yaml', 'utf8'));
+  } catch (e) {
+    console.log(`Error reading suppression.yaml file`);
+    userSuppression = [];
+  }
+  coreoExport('suppression', JSON.stringify(userSuppression));
+}
+
+function setTable() {
+  try {
+    userSchemes = yaml.safeLoad(fs.readFileSync('./table.yaml', 'utf8'));
+  } catch (e) {
+    console.log(`Error reading table.yaml file`);
+    userSchemes = {};
+  }
+  coreoExport('table', JSON.stringify(userSchemes));
+}
+setSuppression();
+setTable();
+
+const argForConfig = {
+    NO_OWNER_EMAIL, cloudObjects, userSuppression, OWNER_TAG,
+    userSchemes, alertListArray, ruleInputs, ALLOW_EMPTY,
+    SEND_ON, cloudAccount, compositeName, planName
+}
+
+
+function createConfig(argForConfig) {
+    let JSON_INPUT = {
+        compositeName: argForConfig.compositeName,
+        planName: argForConfig.planName,
+        violations: argForConfig.cloudObjects,
+        userSchemes: argForConfig.userSchemes,
+        userSuppression: argForConfig.userSuppression,
+        alertList: argForConfig.alertListArray,
+        disabled: argForConfig.ruleInputs,
+        cloudAccount: argForConfig.cloudAccount
+    };
+    let SETTINGS = {
+        NO_OWNER_EMAIL: argForConfig.NO_OWNER_EMAIL,
+        OWNER_TAG: argForConfig.OWNER_TAG,
+        ALLOW_EMPTY: argForConfig.ALLOW_EMPTY, SEND_ON: argForConfig.SEND_ON,
+        SHOWN_NOT_SORTED_VIOLATIONS_COUNTER: false
+    };
+    return {JSON_INPUT, SETTINGS};
+}
+
+const {JSON_INPUT, SETTINGS} = createConfig(argForConfig);
+const CloudCoreoJSRunner = require('cloudcoreo-jsrunner-commons');
+
+const emails = CloudCoreoJSRunner.createEmails(JSON_INPUT, SETTINGS);
+const suppressionJSON = CloudCoreoJSRunner.createJSONWithSuppress(JSON_INPUT, SETTINGS);
+
+coreoExport('JSONReport', JSON.stringify(suppressionJSON));
+coreoExport('report', JSON.stringify(suppressionJSON['violations']));
+
+callback(emails);
+  EOH
+end
+
+coreo_uni_util_variables "inspector-update-planwide-3" do
+  action :set
+  variables([
+                {'COMPOSITE::coreo_uni_util_variables.inspector-planwide.results' => 'COMPOSITE::coreo_uni_util_jsrunner.inspector-tags-to-notifiers-array.JSONReport'},
+                {'COMPOSITE::coreo_aws_rule_runner.advise-inspector.report' => 'COMPOSITE::coreo_uni_util_jsrunner.inspector-tags-to-notifiers-array.report'},
+                {'GLOBAL::table' => 'COMPOSITE::coreo_uni_util_jsrunner.inspector-tags-to-notifiers-array.table'}
+            ])
+end
+
+coreo_uni_util_jsrunner "inspector-tags-rollup" do
+  action :run
+  data_type "text"
+  json_input 'COMPOSITE::coreo_uni_util_jsrunner.inspector-tags-to-notifiers-array.return'
+  function <<-EOH
+const notifiers = json_input;
+
+function setTextRollup() {
+    let emailText = '';
+    let numberOfViolations = 0;
+    notifiers.forEach(notifier => {
+        const hasEmail = notifier['endpoint']['to'].length;
+        if(hasEmail) {
+            numberOfViolations += parseInt(notifier['num_violations']);
+            emailText += "recipient: " + notifier['endpoint']['to'] + " - " + "Violations: " + notifier['num_violations'] + "\\n";
+        }
+    });
+
+    textRollup += 'Number of Violating Cloud Objects: ' + numberOfViolations + "\\n";
+    textRollup += 'Rollup' + "\\n";
+    textRollup += emailText;
+}
+
+let textRollup = '';
+setTextRollup();
+callback(textRollup);
+  EOH
+end
+
+coreo_uni_util_notify "advise-inspector-to-tag-values" do
+  action((("${AUDIT_AWS_INSPECTOR_RECIPIENT}".length > 0)) ? :notify : :nothing)
+  notifiers 'COMPOSITE::coreo_uni_util_jsrunner.inspector-tags-to-notifiers-array.return'
+end
+
+coreo_uni_util_notify "advise-ec2-rollup" do
+  action((("${AUDIT_AWS_INSPECTOR_RECIPIENT}".length > 0) and (! "${AUDIT_AWS_INSPECTOR_OWNER_TAG}".eql?("NOT_A_TAG"))) ? :notify : :nothing)
+  type 'email'
+  allow_empty ${AUDIT_AWS_INSPECTOR_ALLOW_EMPTY}
+  send_on "${AUDIT_AWS_INSPECTOR_SEND_ON}"
+  payload '
+composite name: PLAN::stack_name
+plan name: PLAN::name
+COMPOSITE::coreo_uni_util_jsrunner.inspector-tags-rollup.return
+  '
+  payload_type 'text'
+  endpoint ({
+      :to => '${AUDIT_AWS_INSPECTOR_RECIPIENT}', :subject => 'CloudCoreo ec2 rule results on PLAN::stack_name :: PLAN::name'
+  })
 end
