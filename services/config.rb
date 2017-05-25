@@ -32,7 +32,7 @@ end
 
 coreo_uni_util_jsrunner "usage" do
   action :run
-  json_input 'COMPOSITE::coreo_aws_rule_runner.usage.report'
+  json_input 'COMPOSITE::coreo_aws_rule_runner.advise-inspector.report'
   function <<-EOH
     var new_report = {};
 
