@@ -4,5 +4,4 @@ variables:
         type: array
         default:
             - inspector-findings # 
-            - ec2-inventory # 
-        description: "Which rules would you like to run? Possible values are inspector-findings ec2-inventory"
+        description: "Which rules would you like to run? Possible values are inspector-findings"
