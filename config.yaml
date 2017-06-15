@@ -40,8 +40,12 @@ variables:
       - eu-west-2
       - sa-east-1
   AUDIT_AWS_INSPECTOR_OWNER_TAG:
-      description: "Enter an AWS tag whose value is an email address of the owner of the EC2 object. (Optional)"
-      required: false
-      type: string
-      default: "NOT_A_TAG"
-
+    description: "Enter an AWS tag whose value is an email address of the owner of the EC2 object. (Optional)"
+    required: false
+    type: string
+    default: "NOT_A_TAG"
+  FILTERED_OBJECTS:
+    description: "JSON object of string or regex of aws objects to include or exclude and tag in audit"
+    required: false
+    type: string
+    default:
