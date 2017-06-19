@@ -28,6 +28,7 @@ coreo_aws_rule_runner "advise-inspector" do
   action :run
   service :inspector
   rules ${AUDIT_AWS_INSPECTOR_ALERT_LIST}
+  filter(${FILTERED_OBJECTS}) if ${FILTERED_OBJECTS}
 end
 
 coreo_uni_util_jsrunner "usage" do
