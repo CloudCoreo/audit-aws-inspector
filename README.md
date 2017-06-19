@@ -48,6 +48,9 @@ This composite collects AWS Inspector CIS endpoint violations and reports on the
 ### `AUDIT_AWS_INSPECTOR_RECIPIENT`:
   * description: Enter the email address(es) that will receive notifications. If more than one, separate each with a comma.
 
+### `FILTERED_OBJECTS`:
+  * description: JSON object of string or regex of aws objects to include or exclude and tag in audit
+
 ## Tags
 1. AWS Inspector
 
