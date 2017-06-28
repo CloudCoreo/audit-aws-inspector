@@ -103,7 +103,7 @@ coreo_uni_util_jsrunner "inspector-tags-to-notifiers-array" do
   packages([
                {
                    :name => "cloudcoreo-jsrunner-commons",
-                   :version => "1.9.7-beta22"
+                   :version => "1.9.7-beta30"
                },
                {
                    :name => "js-yaml",
