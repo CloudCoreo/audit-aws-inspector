@@ -1,4 +1,9 @@
 variables:
+  HTML_REPORT_SUBJECT:
+    required: false
+    type: string
+    default:
+    description: "Enter a custom report subject name."
   AUDIT_AWS_INSPECTOR_ALERT_LIST:
     description: "Which alerts would you like to check for? Default is all ec2 ris alerts. Possible value is ec2-get-all-instances-older-than"
     required: false
