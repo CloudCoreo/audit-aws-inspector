@@ -103,7 +103,7 @@ coreo_uni_util_jsrunner "inspector-tags-to-notifiers-array" do
   packages([
                {
                    :name => "cloudcoreo-jsrunner-commons",
-                   :version => "1.10.7-beta51"
+                   :version => "1.10.7-beta53"
                },
                {
                    :name => "js-yaml",
@@ -114,7 +114,7 @@ coreo_uni_util_jsrunner "inspector-tags-to-notifiers-array" do
                 "cloudAccountName": "PLAN::cloud_account_name",
                 "violations": COMPOSITE::coreo_aws_rule_runner.advise-inspector.report}'
   function <<-EOH
-  
+
 const compositeName = json_input.compositeName;
 const planName = json_input.planName;
 const cloudAccount = json_input.cloudAccountName;
