@@ -103,7 +103,7 @@ coreo_uni_util_jsrunner "inspector-tags-to-notifiers-array" do
   packages([
                {
                    :name => "cloudcoreo-jsrunner-commons",
-                   :version => "1.10.7-beta59"
+                   :version => "1.10.7-beta60"
                },
                {
                    :name => "js-yaml",
@@ -234,18 +234,23 @@ const notifiers = json_input;
 function setTextRollup() {
     let emailText = '';
     let numberOfViolations = 0;
+    let usedEmails=new Map();
     notifiers.forEach(notifier => {
         const hasEmail = notifier['endpoint']['to'].length;
-        if(hasEmail) {
+        const email = notifier['endpoint']['to'];
+        if(hasEmail && usedEmails.get(email)!==true) {
+            usedEmails.set(email,true);
             numberOfViolations += parseInt(notifier['num_violations']);
-            emailText += "recipient: " + notifier['endpoint']['to'] + " - " + "Violations: " + notifier['num_violations'] + "\\n";
+            emailText += "recipient: " + notifier['endpoint']['to'] + " - " + "Violations: " + notifier['numberOfViolatingCloudObjects'] + ", Cloud Objects: "+ (notifier["num_violations"]-notifier['numberOfViolatingCloudObjects']) + "\\n";
         }
     });
 
-    textRollup += 'Number of Violating Cloud Objects: ' + numberOfViolations + "\\n";
+    textRollup += 'Total Number of Violating Cloud Objects: ' + numberOfViolations + "\\n";
     textRollup += 'Rollup' + "\\n";
     textRollup += emailText;
+
 }
+
 
 let textRollup = '';
 setTextRollup();
