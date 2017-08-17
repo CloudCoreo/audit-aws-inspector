@@ -54,6 +54,9 @@ This composite collects AWS Inspector CIS endpoint violations and reports on the
 ### `FILTERED_OBJECTS`:
   * description: JSON object of string or regex of aws objects to include or exclude and tag in audit
 
+### `S3_BUCKET_NAME`:
+  * description: Enter S3 bucket name to upload reports. (Optional)
+
 ## Tags
 1. AWS Inspector
 
