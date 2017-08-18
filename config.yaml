@@ -54,7 +54,7 @@ variables:
     required: false
     type: string
     default:
-  S3_BUCKET_NAME:
+  AUDIT_AWS_INSPECTOR_S3_NOTIFICATION_BUCKET_NAME:
     required: false
     type: string
     default:
