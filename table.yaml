@@ -1,3 +1,6 @@
 inspector-findings:
   "Inspector Finding": "__OBJECT__~https://console.aws.amazon.com/inspector/home?region=+__OBJECT__.violations.__RULE__.region+#/finding?filter=%7B%22findingArns%22:%22__OBJECT__%22%7D"
   "AWS Region": "+__OBJECT__.violations.__RULE__.region+"
+default:
+  "Object ID": "__OBJECT__"
+  "Region": "+__OBJECT__.violations.__RULE__.region+"
